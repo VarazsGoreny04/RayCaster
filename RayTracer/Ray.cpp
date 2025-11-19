@@ -1,0 +1,84 @@
+#include "Ray.h"
+
+Ray::Ray()
+{
+	origin = glm::vec3(0);
+	direction = glm::vec3(0);
+}
+
+Ray::Ray(glm::vec3 origin, glm::vec3 direction)
+{
+	this->origin = origin;
+	this->direction = direction;
+}
+
+Ray::~Ray() {}
+
+static bool HitPlane(const Ray& ray, const glm::vec3& planeQ, const glm::vec3& planeI, const glm::vec3& planeJ, Intersection& result)
+{
+	// sík parametrikus egyenlete: palneQ + u * planeI + v * planeJ
+	glm::mat3 A(-ray.direction, planeI, planeJ);
+	glm::vec3 B = ray.origin - planeQ;
+
+	if (fabsf(glm::determinant(A)) < 1e-6)
+		return false;
+
+	glm::vec3 X = glm::inverse(A) * B;
+
+	if (X.x < 0.0)
+		return false;
+
+	result.t = X.x;
+	result.uv.x = X.y;
+	result.uv.y = X.z;
+
+	return true;
+}
+
+static bool HitSphere(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const glm::vec3& sphereCenter, float sphereRadius, float& t)
+{
+	glm::vec3 p_m_c = rayOrigin - sphereCenter;
+	float a = glm::dot(rayDir, rayDir);
+	float b = 2.0f * glm::dot(rayDir, p_m_c);
+	float c = glm::dot(p_m_c, p_m_c) - sphereRadius * sphereRadius;
+
+	float discriminant = b * b - 4.0f * a * c;
+
+	if (discriminant < 0.0f)
+	{
+		return false;
+	}
+
+	float sqrtDiscriminant = sqrtf(discriminant);
+
+	// Mivel 2*a, es sqrt(D) mindig pozitívak, ezért tudjuk, hogy t0 < t1
+	float t0 = (-b - sqrtDiscriminant) / (2.0f * a);
+	float t1 = (-b + sqrtDiscriminant) / (2.0f * a);
+
+	if (t1 < 0.0f) // mivel t0 < t1, ha t1 negatív, akkor t0 is az
+		return false;
+
+	if (t0 < 0.0f)
+		t = t1;
+	else
+		t = t0;
+
+	return true;
+}
+
+static Ray CalculatePixelRay(glm::vec2 pixel, glm::vec2 windowSize, Camera camera)
+{
+	// NDC koordináták kiszámítása
+	glm::vec3 pickedNDC = glm::vec3(
+		2.0f * (pixel.x + 0.5f) / windowSize.x - 1.0f,
+		1.0f - 2.0f * (pixel.y + 0.5f) / windowSize.y, 0.0f);
+
+	// A világ koordináták kiszámítása az inverz ViewProj mátrix segítségével
+	glm::vec4 pickedWorld = glm::inverse(camera.GetViewProj()) * glm::vec4(pickedNDC, 1.0f);
+	pickedWorld /= pickedWorld.w; // homogén osztás
+
+	glm::vec3 origin = camera.GetEye();
+	Ray ray(origin, glm::vec3(pickedWorld) - origin);
+
+	return ray;
+}

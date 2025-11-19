@@ -13,10 +13,77 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="GLUtils">
+      <UniqueIdentifier>{15212904-e4c7-4990-9aeb-de0669be1dc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{46f26832-f9e0-4d95-87d9-77083a94bec8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{dd8d22f3-c89e-4622-9012-0e3a8e509319}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\includes\Camera.cpp">
+      <Filter>GLUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\includes\CameraManipulator.cpp">
+      <Filter>GLUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\includes\GLUtils.cpp">
+      <Filter>GLUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\includes\ObjParser.cpp">
+      <Filter>GLUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\includes\SDL_GLDebugMessageCallback.cpp">
+      <Filter>GLUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="RayTracer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LightSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Ray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\includes\Camera.h">
+      <Filter>GLUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\includes\CameraManipulator.h">
+      <Filter>GLUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\includes\GLUtils.hpp">
+      <Filter>GLUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\includes\ObjParser.h">
+      <Filter>GLUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\includes\SDL_GLDebugMessageCallback.h">
+      <Filter>GLUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="RayTracer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LightSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Ray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Shaders\Frag_ZH.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\Vert_PosNormTex.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
