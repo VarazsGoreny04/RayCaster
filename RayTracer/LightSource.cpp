@@ -33,10 +33,8 @@ std::vector<glm::vec2> LightSource::Shine(SceneObject sceneObject)
 {
 	std::vector<glm::vec2> points = {};
 
-	for (Vertex vertex : sceneObject.objContainer.meshObject.vertexArray)
-	{
-		points.push_back(vertex.position * sceneObject.transform);
-	}
+	for (const Vertex& vertex : sceneObject.objContainer.meshObject.vertexArray)
+		points.push_back(sceneObject.transform * glm::vec4(vertex.position, 1));
 
 	std::vector<glm::vec2> intersections = {};
 

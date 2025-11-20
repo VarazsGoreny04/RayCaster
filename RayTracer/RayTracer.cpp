@@ -126,10 +126,13 @@ void RayTracer::CleanTextures() const
 
 void RayTracer::InitObjects()
 {
-	objects.push_back(SceneObject(quad, glm::translate(glm::vec3(0.5, 0, 0)) * glm::scale(glm::vec3(0.1, 1, 1))));
-	/*objects.push_back(SceneObject(quad, glm::translate(glm::vec3(-0.5, 0, 0)) * glm::scale(glm::vec3(0.1, 1, 1))));
-	objects.push_back(SceneObject(quad, glm::translate(glm::vec3(0, 0.5, 0)) * glm::scale(glm::vec3(1, 0.1, 1))));
-	objects.push_back(SceneObject(quad, glm::translate(glm::vec3(0, -0.5, 0)) * glm::scale(glm::vec3(1, 0.1, 1))));*/
+	objects.push_back(SceneObject(quad, 
+		glm::translate(glm::vec3(0.5, 0, 0)) * 
+		glm::rotate(glm::radians(45.0f), glm::vec3(0, 0, 1)) * 
+		glm::scale(glm::vec3(0.1, 1, 1))));
+	//objects.push_back(SceneObject(quad, glm::translate(glm::vec3(-0.5, 0, 0)) * glm::scale(glm::vec3(0.1, 1, 1))));
+	//objects.push_back(SceneObject(quad, glm::translate(glm::vec3(0, 0.5, 0)) * glm::scale(glm::vec3(1, 0.1, 1))));
+	//objects.push_back(SceneObject(quad, glm::translate(glm::vec3(0, -0.5, 0)) * glm::scale(glm::vec3(1, 0.1, 1))));
 }
 
 bool RayTracer::Init()

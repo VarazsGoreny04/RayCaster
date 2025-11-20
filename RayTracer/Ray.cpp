@@ -106,16 +106,16 @@ glm::vec2 Intersect(Ray& ray, glm::vec2 a, glm::vec2 b)
 	return Intersect(ray, ab);
 }
 
-glm::vec2 Intersect(Ray& ray, std::vector<Vertex> points)
+glm::vec2 Intersect(Ray& ray, std::vector<glm::vec2> points)
 {
 	int length = points.size();
 	std::vector<glm::vec2> intersections = {};
 
 	for (int i = 0; i < length; ++i)
 	{
-		glm::vec3 pointI = points[i].position;
-		glm::vec3 pointINext = points[(i + 1) % length].position;
-		intersections.push_back(Intersect(ray, glm::vec2(pointI.x, pointI.y), glm::vec2(pointINext.x, pointINext.y)));
+		glm::vec2 pointI = points[i];
+		glm::vec2 pointINext = points[(i + 1) % length];
+		intersections.push_back(Intersect(ray, pointI, pointINext));
 	}
 
 	float minDistance = INFINITY;
