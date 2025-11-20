@@ -40,17 +40,50 @@ static MeshObject<Vertex> createQuad()
 	MeshObject<Vertex> mesh;
 
 	mesh.vertexArray = {
-		{{-0.5f, 0.0f,  0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-		{{ 0.5f, 0.0f,  0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-		{{ 0.5f, 0.0f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}},
-		{{-0.5f, 0.0f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f}},
-		{{-0.5f, 0.0f,  0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},
-		{{ 0.5f, 0.0f,  0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},
-		{{ 0.5f, 0.0f, -0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f}},
-		{{-0.5f, 0.0f, -0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f}},
+		{{-0.5f,  0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+		{{ 0.5f,  0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+		{{ 0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}},
+		{{-0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f}},
+		{{-0.5f,  0.5f, 0.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},
+		{{ 0.5f,  0.5f, 0.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},
+		{{ 0.5f, -0.5f, 0.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f}},
+		{{-0.5f, -0.5f, 0.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f}},
 	};
 
 	mesh.indexArray = { 0, 1, 2, 2, 3, 0, 4, 6, 5, 6, 4, 7 };
+
+	return mesh;
+}
+
+static MeshObject<Vertex> createCircle(int sides)
+{
+	MeshObject<Vertex> mesh;
+
+	for (int i = 0; i < sides; ++i)
+	{
+		float radian = glm::radians(360.0f / sides * i);
+		mesh.vertexArray.push_back({ {glm::cos(radian) / 2, glm::sin(radian) / 2, 0}, {0, 1, 0}, {0, 0} });
+	}
+
+	for (int i = 1; i < sides; ++i)
+	{
+		mesh.indexArray.push_back(0);
+		mesh.indexArray.push_back(i);
+		mesh.indexArray.push_back(i + 1);
+	}
+
+	for (int i = 0; i < sides; ++i)
+	{
+		float radian = glm::radians(360.0f / sides * i);
+		mesh.vertexArray.push_back({ {glm::cos(radian) / 2, glm::sin(radian) / 2, 0}, {0, -1, 0}, {0, 0} });
+	}
+
+	for (int i = sides; i < 2 * sides; ++i)
+	{
+		mesh.indexArray.push_back(sides);
+		mesh.indexArray.push_back(i + 1);
+		mesh.indexArray.push_back(i);
+	}
 
 	return mesh;
 }
@@ -64,11 +97,17 @@ void RayTracer::InitGeometry()
 		{2, offsetof(Vertex, texcoord), 2, GL_FLOAT},
 	};
 
-	m_quadGPU = CreateGLObjectFromMesh(createQuad(), vertexAttribList);
+	quad.meshObject = createQuad();
+	quad.oglObject = CreateGLObjectFromMesh(quad.meshObject, vertexAttribList);
+
+	circle.meshObject = createCircle(30);
+	circle.oglObject = CreateGLObjectFromMesh(circle.meshObject, vertexAttribList);
 }
 
 void RayTracer::CleanGeometry()
 {
+	CleanOGLObject(quad.oglObject);
+	CleanOGLObject(circle.oglObject);
 }
 
 void RayTracer::InitTextures()
@@ -85,29 +124,34 @@ void RayTracer::CleanTextures() const
 	glDeleteSamplers(1, &m_SamplerID);
 }
 
+void RayTracer::InitObjects()
+{
+	objects.push_back(SceneObject(quad, glm::translate(glm::vec3(0.5, 0, 0)) * glm::scale(glm::vec3(0.1, 1, 1))));
+	/*objects.push_back(SceneObject(quad, glm::translate(glm::vec3(-0.5, 0, 0)) * glm::scale(glm::vec3(0.1, 1, 1))));
+	objects.push_back(SceneObject(quad, glm::translate(glm::vec3(0, 0.5, 0)) * glm::scale(glm::vec3(1, 0.1, 1))));
+	objects.push_back(SceneObject(quad, glm::translate(glm::vec3(0, -0.5, 0)) * glm::scale(glm::vec3(1, 0.1, 1))));*/
+
+	objects.push_back(SceneObject(circle, glm::scale(glm::vec3(0.03, 0.03, 1))));
+}
+
 bool RayTracer::Init()
 {
 	SetupDebugCallback();
 
-	// törlési szín legyen kékes
 	glClearColor(0.125f, 0.25f, 0.5f, 1.0f);
 
 	InitShaders();
 	InitGeometry();
 	InitTextures();
-
-	//
-	// egyéb inicializálás
-	//
+	InitObjects();
 
 	glEnable(GL_CULL_FACE); // kapcsoljuk be a hátrafelé nézõ lapok eldobását
 	glCullFace(GL_BACK);    // GL_BACK: a kamerától "elfelé" nézõ lapok, GL_FRONT: a kamera felé nézõ lapok
 
 	glEnable(GL_DEPTH_TEST); // mélységi teszt bekapcsolása (takarás)
 
-	// kamera
 	m_camera.SetView(
-		glm::vec3(2.0, 0.0, 0.0),  // honnan nézzük a színteret	   - eye
+		glm::vec3(0.0, 0.0, 2.0),  // honnan nézzük a színteret	   - eye
 		glm::vec3(0.0, 0.0, 0.0),  // a színtér melyik pontját nézzük - at
 		glm::vec3(0.0, 1.0, 0.0)); // felfelé mutató irány a világban - up
 
@@ -151,16 +195,6 @@ void RayTracer::SetCommonUniforms()
 	glProgramUniform1f(m_programID, ul(m_programID, "lightSwitch"), lightSwitch);
 
 	glProgramUniform1i(m_programID, ul(m_programID, "state"), state);
-
-	/*glProgramUniform4fv(m_programID, ul(m_programID, "lightPos"), 1, glm::value_ptr(m_lightPos));
-
-	glProgramUniform3fv(m_programID, ul(m_programID, "La"), 1, glm::value_ptr(m_La));
-	glProgramUniform3fv(m_programID, ul(m_programID, "Ld"), 1, glm::value_ptr(m_Ld));
-	glProgramUniform3fv(m_programID, ul(m_programID, "Ls"), 1, glm::value_ptr(m_Ls));
-
-	glProgramUniform1f(m_programID, ul(m_programID, "lightConstantAttenuation"), m_lightConstantAttenuation);
-	glProgramUniform1f(m_programID, ul(m_programID, "lightLinearAttenuation"), m_lightLinearAttenuation);
-	glProgramUniform1f(m_programID, ul(m_programID, "lightQuadraticAttenuation"), m_lightQuadraticAttenuation);*/
 }
 
 void RayTracer::DrawObject(OGLObject& obj, const glm::mat4& world) {
@@ -170,24 +204,12 @@ void RayTracer::DrawObject(OGLObject& obj, const glm::mat4& world) {
 	glDrawElements(GL_TRIANGLES, obj.count, GL_UNSIGNED_INT, nullptr);
 }
 
-/*void RayTracer::RenderTable()
+void RayTracer::RenderSceneObject(SceneObject sceneObject)
 {
 	glUniform1i(ul("state"), 0);
 	glUniform1i(ul("lightSwitch"), false);
 
-	glBindTextureUnit(0, m_tableTextureID);
-
-	DrawObject(m_quadGPU, glm::translate(glm::vec3(0.0, -0.1, 0.0)) * glm::scale(glm::vec3(30.0, 0.0, 21.0)));
-
-	glUniform1i(ul("lightSwitch"), true);
-}*/
-
-void RayTracer::RenderBoxes()
-{
-	glUniform1i(ul("state"), 0);
-	glUniform1i(ul("lightSwitch"), false);
-
-	DrawObject(m_quadGPU, glm::rotate<float>(glm::radians(90.0), glm::vec3(0, 0, 1)));
+	DrawObject(sceneObject.objContainer.oglObject, sceneObject.transform);
 }
 
 void RayTracer::Render()
@@ -206,8 +228,16 @@ void RayTracer::Render()
 	glBindSampler(0, m_SamplerID);
 	//glBindSampler(1, m_SamplerID);
 
-	//RenderTable();
-	RenderBoxes();
+	for (const SceneObject& sceneObject : objects)
+	{
+		//RenderSceneObject(sceneObject);
+
+		std::vector<glm::vec2> hits = lightSource.Shine(sceneObject.objContainer.meshObject.vertexArray);
+
+		for (glm::vec2 hit : hits)
+			RenderSceneObject(SceneObject(circle, glm::translate(glm::vec3(hit.x, hit.y, 0.1)) * glm::scale(glm::vec3(0.02, 0.02, 0.1))));
+	}
+
 
 	glBindTextureUnit(0, 0);
 	glBindSampler(0, 0);
@@ -222,9 +252,13 @@ void RayTracer::RenderGUI()
 	if (ImGui::Begin("Variables"))
 	{
 		ImGui::Checkbox("Lighting", &lightSwitch);
+
 		glm::vec3 camPos = m_camera.GetEye();
-		ImGui::InputFloat3("Camera position", &camPos.x);
+		ImGui::DragFloat3("Camera position", &camPos.x);
 		m_camera.SetView(camPos, m_camera.GetAt(), m_camera.GetWorldUp());
+
+		ImGui::SliderInt("Ray count", &lightSource.rayCount, 0, 20);
+		ImGui::DragFloat2("Ray count", &lightSource.origin.x, 0.01, -0.5, 0.5);
 	}
 	ImGui::End();
 }

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef RAYTRACER_H
+#define RAYTRACER_H
 
 // GLM
 #include <glm/glm.hpp>
@@ -16,6 +17,10 @@
 #include "../includes/Camera.h"
 #include "../includes/CameraManipulator.h"
 #include "../includes/GLUtils.hpp"
+
+// Mine
+#include "LightSource.h"
+#include "SceneObject.h"
 
 struct SUpdateInfo
 {
@@ -43,7 +48,7 @@ public:
 	void RenderGUI();
 
 	//void RenderTable();
-	void RenderBoxes();
+	void RenderSceneObject(SceneObject object);
 
 	void KeyboardDown(const SDL_KeyboardEvent&);
 	void KeyboardUp(const SDL_KeyboardEvent&);
@@ -61,6 +66,9 @@ protected:
 	// Adat változók
 
 	float m_ElapsedTimeInSec = 0.0f;
+
+	LightSource lightSource = LightSource(glm::vec2(0, 0), 12);
+
 
 	// Picking
 
@@ -92,18 +100,22 @@ protected:
 
 	void SetCommonUniforms();
 	void DrawObject(OGLObject& obj, const glm::mat4& world);
+	
+	ObjectContainer quad;
+	ObjectContainer circle;
 
-	OGLObject m_quadGPU = {};
+	std::vector<SceneObject> objects;
 
 	// Geometria inicializálása, és törlése
 	void InitGeometry();
 	void CleanGeometry();
+	void InitObjects();
 
 	// Textúrázás, és változói
 	GLuint m_SamplerID = 0;
 
-	GLuint m_BoxTextureID = 0;
-
 	void InitTextures();
 	void CleanTextures() const;
 };
+
+#endif // RAYTRACER_H

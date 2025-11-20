@@ -91,6 +91,7 @@
     <ClCompile Include="..\includes\Camera.cpp" />
     <ClCompile Include="..\includes\ObjParser.cpp" />
     <ClCompile Include="..\includes\CameraManipulator.cpp" />
+    <ClCompile Include="SceneObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LightSource.h" />
@@ -101,10 +102,15 @@
     <ClInclude Include="..\includes\Camera.h" />
     <ClInclude Include="..\includes\ObjParser.h" />
     <ClInclude Include="..\includes\CameraManipulator.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="SceneObject.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Shaders\Vert_PosNormTex.vert" />
     <None Include="..\Shaders\Frag_ZH.frag" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="RayTracer.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
