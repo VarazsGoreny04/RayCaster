@@ -2,138 +2,97 @@
 
 Ray::Ray()
 {
-	origin = glm::vec2(0);
-	direction = glm::vec2(0);
+	origin = glm::vec3(0);
+	direction = glm::vec3(0);
+}
+
+Ray::Ray(glm::vec3 origin, glm::vec3 direction)
+{
+	this->origin = origin;
+	this->direction = direction;
 }
 
 Ray::Ray(glm::vec2 origin, glm::vec2 direction)
 {
-	this->origin = glm::vec3(origin.x, origin.y, 0);
-	this->direction = glm::vec3(direction.x, direction.y, 0);
+	this->origin = glm::vec3(origin, 0);
+	this->direction = glm::vec3(direction, 0);
 }
 
 Ray::~Ray() {}
 
-/*static bool HitPlane(const Ray& ray, const glm::vec3& planeQ, const glm::vec3& planeI, const glm::vec3& planeJ, Intersection& result)
+static bool OutOfSection(float section1, float section2, float value)
 {
-	// sík parametrikus egyenlete: palneQ + u * planeI + v * planeJ
-	glm::mat3 A(-ray.direction, planeI, planeJ);
-	glm::vec3 B = ray.origin - planeQ;
-
-	if (fabsf(glm::determinant(A)) < 1e-6)
-		return false;
-
-	glm::vec3 X = glm::inverse(A) * B;
-
-	if (X.x < 0.0)
-		return false;
-
-	result.t = X.x;
-	result.uv.x = X.y;
-	result.uv.y = X.z;
-
-	return true;
-}*/
-
-/*static bool HitSphere(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const glm::vec3& sphereCenter, float sphereRadius, float& t)
-{
-	glm::vec3 p_m_c = rayOrigin - sphereCenter;
-	float a = glm::dot(rayDir, rayDir);
-	float b = 2.0f * glm::dot(rayDir, p_m_c);
-	float c = glm::dot(p_m_c, p_m_c) - sphereRadius * sphereRadius;
-
-	float discriminant = b * b - 4.0f * a * c;
-
-	if (discriminant < 0.0f)
+	if (section2 > section1)
 	{
-		return false;
+		float temp = section1;
+		section1 = section2;
+		section2 = temp;
 	}
 
-	float sqrtDiscriminant = sqrtf(discriminant);
+	section1 += 1e-6f;
+	section2 -= 1e-6f;
 
-	// Mivel 2*a, es sqrt(D) mindig pozitívak, ezért tudjuk, hogy t0 < t1
-	float t0 = (-b - sqrtDiscriminant) / (2.0f * a);
-	float t1 = (-b + sqrtDiscriminant) / (2.0f * a);
+	return section2 > value || value > section1;
+}
 
-	if (t1 < 0.0f) // mivel t0 < t1, ha t1 negatív, akkor t0 is az
-		return false;
-
-	if (t0 < 0.0f)
-		t = t1;
-	else
-		t = t0;
-
-	return true;
-}*/
-
-/*static Ray CalculatePixelRay(glm::vec2 pixel, glm::vec2 windowSize, Camera camera)
+static bool OutOfBox(glm::vec2 boxBound1, glm::vec2 boxBound2, glm::vec2 value)
 {
-	// NDC koordináták kiszámítása
-	glm::vec3 pickedNDC = glm::vec3(
-		2.0f * (pixel.x + 0.5f) / windowSize.x - 1.0f,
-		1.0f - 2.0f * (pixel.y + 0.5f) / windowSize.y, 0.0f);
+	return OutOfSection(boxBound1.x, boxBound2.x, value.x) || OutOfSection(boxBound1.y, boxBound2.y, value.y);
+}
 
-	// A világ koordináták kiszámítása az inverz ViewProj mátrix segítségével
-	glm::vec4 pickedWorld = glm::inverse(camera.GetViewProj()) * glm::vec4(pickedNDC, 1.0f);
-	pickedWorld /= pickedWorld.w; // homogén osztás
-
-	glm::vec3 origin = camera.GetEye();
-	Ray ray(origin, glm::vec3(pickedWorld) - origin);
-
-	return ray;
-}*/
-
-glm::vec2 Intersect(Ray& ray, Ray & side)
+static bool Intersect(Ray& ray, Ray & side, glm::vec2& result)
 {
 	glm::mat2 A(ray.direction, -side.direction);
 	glm::vec2 B = side.origin - ray.origin;
 
 	if (fabsf(glm::determinant(A)) < 1e-6)
-		return glm::vec2(ray.origin);
+		return false;
 
 	glm::vec2 X = glm::inverse(A) * B;
 
 	if (X.x < 0.0)
-		return glm::vec2(ray.origin);
+		return false;
 	else
-		return ray.direction * X.x + ray.origin;
+	{
+		result = ray.direction * X.x + ray.origin;
+		return true;
+	}
 }
 
-glm::vec2 Intersect(Ray& ray, glm::vec2 a, glm::vec2 b)
+static bool Intersect(Ray& ray, glm::vec2 a, glm::vec2 b, glm::vec2& result)
 {
 	Ray &ab = Ray(a, b - a);
 
-	return Intersect(ray, ab);
+	return Intersect(ray, ab, result) && !OutOfBox(a, b, result);
 }
 
-glm::vec2 Intersect(Ray& ray, std::vector<glm::vec2> points)
+bool Intersect(Ray& ray, std::vector<glm::vec2> points, glm::vec2& result)
 {
-	int length = points.size();
+	int length = static_cast<int>(points.size());
 	std::vector<glm::vec2> intersections = {};
 
-	for (int i = 0; i < length; ++i)
+	for (long i = 0; i < length; ++i)
 	{
 		glm::vec2 pointI = points[i];
-		glm::vec2 pointINext = points[(i + 1) % length];
-		intersections.push_back(Intersect(ray, pointI, pointINext));
+		glm::vec2 pointINext = points[(i + 1l) % length];
+		glm::vec2 intersection;
+		
+		if (Intersect(ray, pointI, pointINext, intersection))
+			intersections.push_back(intersection);
 	}
 
 	float minDistance = INFINITY;
-	glm::vec2 minIntersection = ray.origin;
 
-	for (int i = 0; i < length; ++i)
+	for (glm::vec2 intersection : intersections)
 	{
-		if (intersections[i] == ray.origin)
-			continue;
-
-		float distance = glm::distance(ray.origin, intersections[i]);
+		float distance = glm::distance(ray.origin, glm::vec3(intersection, 0));
 
 		if (distance < minDistance)
 		{
 			minDistance = distance;
-			minIntersection = intersections[i];
+			result = intersection;
 		}
 	}
 
-	return minIntersection;
+	return minDistance < INFINITY;
 }

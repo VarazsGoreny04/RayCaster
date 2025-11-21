@@ -15,8 +15,9 @@ class SceneObject
 public:
 	ObjectContainer objContainer;
 	glm::mat4 transform;
+	glm::vec3 color;
 	
-	SceneObject(ObjectContainer objContainer, glm::mat4 transform);
+	SceneObject(ObjectContainer objContainer, glm::mat4 transform, glm::i8vec3 color);
 };
 
 #endif // SCENEOBJECT_H

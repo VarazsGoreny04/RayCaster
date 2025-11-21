@@ -13,8 +13,7 @@ public:
 	int rayCount;
 
 	LightSource(glm::vec2 origin, int rayCount);
-	std::vector<Ray> CastRays();
-	std::vector<glm::vec2> Shine(SceneObject sceneObject);
+	std::vector<glm::vec2> Shine(std::vector<SceneObject> sceneObjects) const;
 };
 
 #endif // LIGHTSOURCE_H

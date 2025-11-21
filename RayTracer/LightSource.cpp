@@ -6,17 +6,34 @@ LightSource::LightSource(glm::vec2 origin, int rayCount)
 	this->rayCount = rayCount;
 }
 
+static std::vector<std::vector<glm::vec2>> GetAllPoints(std::vector<SceneObject> sceneObjects)
+{
+	std::vector<std::vector<glm::vec2>> allPoints = {};
+
+	for (const SceneObject& sceneObject : sceneObjects)
+	{
+		std::vector<glm::vec2> points = {};
+
+		for (const Vertex& vertex : sceneObject.objContainer.meshObject.vertexArray)
+			points.push_back(sceneObject.transform * glm::vec4(vertex.position, 1));
+
+		allPoints.push_back(points);
+	}
+
+	return allPoints;
+}
+
 static Ray CastRay(glm::vec2 origin, float angle)
 {
 	Ray ray{
-		ray.origin = origin,
-		ray.direction = glm::vec2(glm::cos(angle), glm::sin(angle))
+		ray.origin = glm::vec3(origin, 0),
+		ray.direction = glm::vec3(glm::cos(angle), glm::sin(angle), 0)
 	};
 
 	return ray;
 }
 
-std::vector<Ray> LightSource::CastRays()
+static std::vector<Ray> CastRays(glm::vec2 origin, int rayCount)
 {
 	std::vector<Ray> rays(rayCount);
 
@@ -29,19 +46,40 @@ std::vector<Ray> LightSource::CastRays()
 	return rays;
 }
 
-std::vector<glm::vec2> LightSource::Shine(SceneObject sceneObject)
+static bool ClosestIntersection(Ray& ray, std::vector<std::vector<glm::vec2>> allPoints, glm::vec2& result)
 {
-	std::vector<glm::vec2> points = {};
+	float minDistance = INFINITY;
 
-	for (const Vertex& vertex : sceneObject.objContainer.meshObject.vertexArray)
-		points.push_back(sceneObject.transform * glm::vec4(vertex.position, 1));
+	for (std::vector<glm::vec2> points : allPoints)
+	{
+		glm::vec2 intersection;
+		if (Intersect(ray, points, intersection))
+		{
+			float distance = glm::distance(ray.origin, glm::vec3(intersection, 0));
+
+			if (distance < minDistance)
+			{
+				minDistance = distance;
+				result = intersection;
+			}
+		}
+	}
+
+	return minDistance < INFINITY;
+}
+
+std::vector<glm::vec2> LightSource::Shine(std::vector<SceneObject> sceneObjects) const
+{
+	std::vector<std::vector<glm::vec2>> allPoints = GetAllPoints(sceneObjects);
 
 	std::vector<glm::vec2> intersections = {};
 
-	for (Ray ray : CastRays())
+	for (Ray ray : CastRays(origin, rayCount))
 	{
-		//intersections.push_back(ray.direction + ray.origin);
-		intersections.push_back(Intersect(ray, points));
+		glm::vec2 intersection;
+
+		if (ClosestIntersection(ray, allPoints, intersection))
+			intersections.push_back(intersection);
 	}
 
 	return intersections;

@@ -8,16 +8,15 @@
 class Ray
 {
 public:
-	glm::vec2 origin;
-	glm::vec2 direction;
+	glm::vec3 origin;
+	glm::vec3 direction;
 
 	Ray();
+	Ray(glm::vec3 origin, glm::vec3 direction);
 	Ray(glm::vec2 origin, glm::vec2 direction);
 	~Ray();
 };
 
-glm::vec2 Intersect(Ray& a, Ray& b);
-glm::vec2 Intersect(Ray& ray, glm::vec2 a, glm::vec2 b);
-glm::vec2 Intersect(Ray& ray, std::vector<glm::vec2> points);
+bool Intersect(Ray& ray, std::vector<glm::vec2> points, glm::vec2& result);
 
 #endif // RAY_H

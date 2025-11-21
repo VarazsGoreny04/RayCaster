@@ -1,6 +1,6 @@
 #version 430
 
-uniform int state = 0;
+uniform vec3 color;
 
 uniform bool lightSwitch = true;
 
@@ -73,7 +73,7 @@ struct MaterialProperties
 
 void main()
 {
-	fs_out_col = vec4(0, 1, 0, 1);
+	fs_out_col = vec4(color, 1);
 
 	/*
 	textureCoord = vs_out_tex;

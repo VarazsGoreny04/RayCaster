@@ -35,7 +35,7 @@ void RayTracer::CleanShaders() const
 	glDeleteProgram(m_programID);
 }
 
-static MeshObject<Vertex> createQuad()
+static MeshObject<Vertex> CreateQuad()
 {
 	MeshObject<Vertex> mesh;
 
@@ -55,14 +55,14 @@ static MeshObject<Vertex> createQuad()
 	return mesh;
 }
 
-static MeshObject<Vertex> createCircle(int sides)
+static MeshObject<Vertex> CreateCircle(int sides)
 {
 	MeshObject<Vertex> mesh;
 
 	for (int i = 0; i < sides; ++i)
 	{
 		float radian = glm::radians(360.0f / sides * i);
-		mesh.vertexArray.push_back({ {glm::cos(radian) / 2, glm::sin(radian) / 2, 0}, {0, 1, 0}, {0, 0} });
+		mesh.vertexArray.push_back({ {glm::cos(radian) / 2, glm::sin(radian) / 2, 0}, {1, 0, 0}, {0, 0} });
 	}
 
 	for (int i = 1; i < sides - 1; ++i)
@@ -88,6 +88,75 @@ static MeshObject<Vertex> createCircle(int sides)
 	return mesh;
 }
 
+static bool HitPlane(const Ray& ray, const glm::vec3& planeQ, const glm::vec3& planeI, const glm::vec3& planeJ, Intersection& result)
+{
+	// sík parametrikus egyenlete: palneQ + u * planeI + v * planeJ
+	glm::mat3 A(-ray.direction, planeI, planeJ);
+	glm::vec3 B = ray.origin - planeQ;
+
+	if (fabsf(glm::determinant(A)) < 1e-6)
+		return false;
+
+	glm::vec3 X = glm::inverse(A) * B;
+
+	if (X.x < 0.0)
+		return false;
+
+	result.t = X.x;
+	result.uv.x = X.y;
+	result.uv.y = X.z;
+
+	return true;
+}
+
+/*static bool HitSphere(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const glm::vec3& sphereCenter, float sphereRadius, float& t)
+{
+	glm::vec3 p_m_c = rayOrigin - sphereCenter;
+	float a = glm::dot(rayDir, rayDir);
+	float b = 2.0f * glm::dot(rayDir, p_m_c);
+	float c = glm::dot(p_m_c, p_m_c) - sphereRadius * sphereRadius;
+
+	float discriminant = b * b - 4.0f * a * c;
+
+	if (discriminant < 0.0f)
+	{
+		return false;
+	}
+
+	float sqrtDiscriminant = sqrtf(discriminant);
+
+	// Mivel 2*a, es sqrt(D) mindig pozitívak, ezért tudjuk, hogy t0 < t1
+	float t0 = (-b - sqrtDiscriminant) / (2.0f * a);
+	float t1 = (-b + sqrtDiscriminant) / (2.0f * a);
+
+	if (t1 < 0.0f) // mivel t0 < t1, ha t1 negatív, akkor t0 is az
+		return false;
+
+	if (t0 < 0.0f)
+		t = t1;
+	else
+		t = t0;
+
+	return true;
+}*/
+
+static Ray CalculatePixelRay(glm::vec2 pixel, glm::vec2 windowSize, Camera camera)
+{
+	// NDC koordináták kiszámítása
+	glm::vec3 pickedNDC = glm::vec3(
+		2.0f * (pixel.x + 0.5f) / windowSize.x - 1.0f,
+		1.0f - 2.0f * (pixel.y + 0.5f) / windowSize.y, 0.0f);
+
+	// A világ koordináták kiszámítása az inverz ViewProj mátrix segítségével
+	glm::vec4 pickedWorld = glm::inverse(camera.GetViewProj()) * glm::vec4(pickedNDC, 1.0f);
+	pickedWorld /= pickedWorld.w; // homogén osztás
+
+	glm::vec3 origin = camera.GetEye();
+	Ray ray(origin, glm::vec3(pickedWorld) - origin);
+
+	return ray;
+}
+
 void RayTracer::InitGeometry()
 {
 	const std::initializer_list<VertexAttributeDescriptor> vertexAttribList =
@@ -97,10 +166,10 @@ void RayTracer::InitGeometry()
 		{2, offsetof(Vertex, texcoord), 2, GL_FLOAT},
 	};
 
-	quad.meshObject = createQuad();
+	quad.meshObject = CreateQuad();
 	quad.oglObject = CreateGLObjectFromMesh(quad.meshObject, vertexAttribList);
 
-	circle.meshObject = createCircle(30);
+	circle.meshObject = CreateCircle(30);
 	circle.oglObject = CreateGLObjectFromMesh(circle.meshObject, vertexAttribList);
 }
 
@@ -127,12 +196,22 @@ void RayTracer::CleanTextures() const
 void RayTracer::InitObjects()
 {
 	objects.push_back(SceneObject(quad, 
-		glm::translate(glm::vec3(0.5, 0, 0)) * 
-		glm::rotate(glm::radians(45.0f), glm::vec3(0, 0, 1)) * 
-		glm::scale(glm::vec3(0.1, 1, 1))));
-	//objects.push_back(SceneObject(quad, glm::translate(glm::vec3(-0.5, 0, 0)) * glm::scale(glm::vec3(0.1, 1, 1))));
-	//objects.push_back(SceneObject(quad, glm::translate(glm::vec3(0, 0.5, 0)) * glm::scale(glm::vec3(1, 0.1, 1))));
-	//objects.push_back(SceneObject(quad, glm::translate(glm::vec3(0, -0.5, 0)) * glm::scale(glm::vec3(1, 0.1, 1))));
+		glm::translate(glm::vec3(5.5, 0, 0)) * glm::scale(glm::vec3(1, 10, 1)),
+		glm::i8vec3(0, 1, 0)));
+	objects.push_back(SceneObject(quad, 
+		glm::translate(glm::vec3(-5.5, 0, 0)) * glm::scale(glm::vec3(1, 10, 1)), 
+		glm::i8vec3(0, 1, 0)));
+	objects.push_back(SceneObject(quad, glm::translate(glm::vec3(0, 5.5, 0)) * glm::scale(glm::vec3(10, 1, 1)),
+		glm::i8vec3(0, 1, 0)));
+	objects.push_back(SceneObject(quad, glm::translate(glm::vec3(0, -5.5, 0)) * glm::scale(glm::vec3(10, 1, 1)),
+		glm::i8vec3(0, 1, 0)));
+
+	objects.push_back(SceneObject(quad, glm::translate(glm::vec3(1, 1, 0)),
+		glm::i8vec3(0, 1, 0)));
+	objects.push_back(SceneObject(quad, glm::translate(glm::vec3(-1, -1, 0)),
+		glm::i8vec3(0, 1, 0)));
+	objects.push_back(SceneObject(quad, glm::translate(glm::vec3(-3, 3, 0)) * glm::scale(glm::vec3(4, 1, 1)),
+		glm::i8vec3(0, 1, 0)));
 }
 
 bool RayTracer::Init()
@@ -152,7 +231,7 @@ bool RayTracer::Init()
 	glEnable(GL_DEPTH_TEST); // mélységi teszt bekapcsolása (takarás)
 
 	m_camera.SetView(
-		glm::vec3(0.0, 0.0, 2.0),  // honnan nézzük a színteret	   - eye
+		glm::vec3(0.0, 0.0, 3.0),  // honnan nézzük a színteret	   - eye
 		glm::vec3(0.0, 0.0, 0.0),  // a színtér melyik pontját nézzük - at
 		glm::vec3(0.0, 1.0, 0.0)); // felfelé mutató irány a világban - up
 
@@ -173,16 +252,20 @@ void RayTracer::Update(const SUpdateInfo& updateInfo)
 {
 	m_ElapsedTimeInSec = updateInfo.ElapsedTimeInSec;
 
-	/*if (m_IsPicking) {
+	if (m_IsPicking)
+	{
 		// a felhasználó Ctrl + kattintott, itt kezeljük le
 		// sugár indítása a kattintott pixelen át
-		Ray ray = CalculatePixelRay(glm::vec2(m_PickedPixel.x, m_PickedPixel.y));
+		Ray ray = CalculatePixelRay(glm::vec2(m_PickedPixel.x, m_PickedPixel.y), m_windowSize, m_camera);
 		Intersection intersect;
+		if (HitPlane(ray, glm::vec3(0, 0, 0), glm::vec3(1, 0, 0), glm::vec3(0, 1, 0), intersect))
+			lightSource.origin = intersect.uv;
 
 		m_IsPicking = false;
-	}*/
+	}
 
 	m_cameraManipulator.Update(updateInfo.DeltaTimeInSec);
+
 }
 
 void RayTracer::SetCommonUniforms()
@@ -194,8 +277,6 @@ void RayTracer::SetCommonUniforms()
 	// - Fényforrások beállítása
 	glProgramUniform3fv(m_programID, ul(m_programID, "cameraPosition"), 1, glm::value_ptr(m_camera.GetEye()));
 	glProgramUniform1f(m_programID, ul(m_programID, "lightSwitch"), showSceneObjects);
-
-	glProgramUniform1i(m_programID, ul(m_programID, "state"), state);
 }
 
 void RayTracer::DrawObject(OGLObject& obj, const glm::mat4& world) {
@@ -207,6 +288,7 @@ void RayTracer::DrawObject(OGLObject& obj, const glm::mat4& world) {
 
 void RayTracer::RenderSceneObject(SceneObject sceneObject)
 {
+	glProgramUniform3fv(m_programID, ul(m_programID, "color"), 1, glm::value_ptr(sceneObject.color));
 	DrawObject(sceneObject.objContainer.oglObject, sceneObject.transform);
 }
 
@@ -227,18 +309,16 @@ void RayTracer::Render()
 	//glBindSampler(1, m_SamplerID);
 
 	if (showSceneObjects)
-		RenderSceneObject(SceneObject(circle, glm::translate(glm::vec3(lightSource.origin, 0)) * glm::scale(glm::vec3(0.03, 0.03, 1))));
+		RenderSceneObject(SceneObject(circle, glm::translate(glm::vec3(lightSource.origin, 0)) * glm::scale(glm::vec3(0.3, 0.3, 1)), glm::vec3(1, 0, 0)));
 
 	for (const SceneObject& sceneObject : objects)
 	{
 		if (showSceneObjects)
 			RenderSceneObject(sceneObject);
-
-		std::vector<glm::vec2> hits = lightSource.Shine(sceneObject);
-
-		for (glm::vec2 hit : hits)
-			RenderSceneObject(SceneObject(circle, glm::translate(glm::vec3(hit.x, hit.y, 0.1)) * glm::scale(glm::vec3(0.02, 0.02, 0.1))));
 	}
+
+	for (glm::vec2 hit : lightSource.Shine(objects))
+		RenderSceneObject(SceneObject(circle, glm::translate(glm::vec3(hit.x, hit.y, -0.01)) * glm::scale(glm::vec3(0.2, 0.2, 1)), glm::vec3(1, 0, 0)));
 
 
 	glBindTextureUnit(0, 0);
@@ -254,13 +334,8 @@ void RayTracer::RenderGUI()
 	if (ImGui::Begin("Variables"))
 	{
 		ImGui::Checkbox("Show SceneObjects", &showSceneObjects);
-
-		glm::vec3 camPos = m_camera.GetEye();
-		ImGui::DragFloat3("Camera position", &camPos.x);
-		m_camera.SetView(camPos, m_camera.GetAt(), m_camera.GetWorldUp());
-
-		ImGui::SliderInt("Ray count", &lightSource.rayCount, 0, 20);
-		ImGui::DragFloat2("Ray count", &lightSource.origin.x, 0.01, -0.5, 0.5);
+		ImGui::SliderInt("Ray count", &lightSource.rayCount, 0, 200);
+		ImGui::DragFloat2("Ray count", &lightSource.origin.x, 0.01, -5, 5);
 	}
 	ImGui::End();
 }
@@ -318,9 +393,8 @@ void RayTracer::MouseMove(const SDL_MouseMotionEvent& mouse)
 void RayTracer::MouseDown(const SDL_MouseButtonEvent& mouse)
 {
 	if (m_IsCtrlDown)
-	{
 		m_IsPicking = true;
-	}
+
 	m_PickedPixel = { mouse.x, mouse.y };
 }
 

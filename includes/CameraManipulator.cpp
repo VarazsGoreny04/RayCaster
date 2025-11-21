@@ -112,7 +112,6 @@ void CameraManipulator::KeyboardUp(const SDL_KeyboardEvent& key)
 	}
 }
 
-
 void CameraManipulator::MouseMove(const SDL_MouseMotionEvent& mouse)
 {
 	if (mouse.state & SDL_BUTTON_LMASK)
