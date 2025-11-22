@@ -68,7 +68,7 @@ protected:
 	float m_ElapsedTimeInSec = 0.0f;
 
 	bool showSceneObjects = false;
-	LightSource lightSource = LightSource(glm::vec2(0, 0), 12);
+	LightSource lightSource = LightSource(glm::vec2(0, 0), 0, 120, 200);
 
 
 	// Picking

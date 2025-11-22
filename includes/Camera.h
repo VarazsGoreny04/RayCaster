@@ -46,7 +46,7 @@ private:
 	glm::mat4	m_viewMatrix;
 
 	// projection parameters
-	float m_zNear =    0.01f;
+	float m_zNear =	0.01f;
 	float m_zFar  = 1000.0f;
 
 	float m_angle = glm::radians( 27.0f );

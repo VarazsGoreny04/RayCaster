@@ -82,6 +82,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="From2D.cpp" />
     <ClCompile Include="LightSource.cpp" />
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="RayTracer.cpp" />
@@ -94,6 +95,7 @@
     <ClCompile Include="SceneObject.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="From2D.h" />
     <ClInclude Include="LightSource.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="RayTracer.h" />

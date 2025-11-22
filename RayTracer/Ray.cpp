@@ -35,12 +35,15 @@ static bool OutOfSection(float section1, float section2, float value)
 	return section2 > value || value > section1;
 }
 
-static bool OutOfBox(glm::vec2 boxBound1, glm::vec2 boxBound2, glm::vec2 value)
+static bool OutOfSection(glm::vec2 boxBound1, glm::vec2 boxBound2, glm::vec2 value)
 {
-	return OutOfSection(boxBound1.x, boxBound2.x, value.x) || OutOfSection(boxBound1.y, boxBound2.y, value.y);
+	if (glm::distance(boxBound1.x, boxBound2.x) > glm::distance(boxBound1.y, boxBound2.y))
+		return OutOfSection(boxBound1.x, boxBound2.x, value.x);
+	else
+		return OutOfSection(boxBound1.y, boxBound2.y, value.y);
 }
 
-static bool Intersect(Ray& ray, Ray & side, glm::vec2& result)
+static bool Intersect(Ray& ray, Ray& side, glm::vec2& result)
 {
 	glm::mat2 A(ray.direction, -side.direction);
 	glm::vec2 B = side.origin - ray.origin;
@@ -61,9 +64,9 @@ static bool Intersect(Ray& ray, Ray & side, glm::vec2& result)
 
 static bool Intersect(Ray& ray, glm::vec2 a, glm::vec2 b, glm::vec2& result)
 {
-	Ray &ab = Ray(a, b - a);
+	Ray& ab = Ray(a, b - a);
 
-	return Intersect(ray, ab, result) && !OutOfBox(a, b, result);
+	return Intersect(ray, ab, result) && !OutOfSection(a, b, result);
 }
 
 bool Intersect(Ray& ray, std::vector<glm::vec2> points, glm::vec2& result)
@@ -76,7 +79,7 @@ bool Intersect(Ray& ray, std::vector<glm::vec2> points, glm::vec2& result)
 		glm::vec2 pointI = points[i];
 		glm::vec2 pointINext = points[(i + 1l) % length];
 		glm::vec2 intersection;
-		
+
 		if (Intersect(ray, pointI, pointINext, intersection))
 			intersections.push_back(intersection);
 	}

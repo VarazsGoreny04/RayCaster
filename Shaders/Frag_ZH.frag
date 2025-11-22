@@ -27,9 +27,9 @@ uniform vec3 La = vec3(0.1, 0.1, 0.1 );
 uniform vec3 Ld = vec3(1.0, 1.0, 1.0 );
 uniform vec3 Ls = vec3(1.0, 1.0, 1.0 );
 
-uniform float lightConstantAttenuation    = 1.0;
-uniform float lightLinearAttenuation      = 0.0;
-uniform float lightQuadraticAttenuation   = 0.0;
+uniform float lightConstantAttenuation	= 1.0;
+uniform float lightLinearAttenuation	= 0.0;
+uniform float lightQuadraticAttenuation	= 0.0;
 
 // anyag tulajdonságok 
 

@@ -153,7 +153,7 @@ template <typename VertexT>
 			vertexAttrDesc.numberOfComponents,	  // komponens szam
 			vertexAttrDesc.glType,				  // adatok tipusa
 			GL_FALSE,							  // normalizalt legyen-e
-			vertexAttrDesc.strideInBytes       // az attribútum hol kezdődik a sizeof(VertexT)-nyi területen belül
+			vertexAttrDesc.strideInBytes	   // az attribútum hol kezdődik a sizeof(VertexT)-nyi területen belül
 		);
 	}
 	glVertexArrayElementBuffer(meshGPU.vaoID, meshGPU.iboID);

@@ -352,14 +352,14 @@ ObjParser::Mesh ObjParser::parse(const std::filesystem::path& fileName)
 							}
 							else if ( eig2 == minEig )
 							{
-                                eigenVectors[ 0 ] = glm::normalize( eigenVectors_[ 0 ] );
-                                eigenVectors[ 1 ] = glm::normalize( eigenVectors_[ 2 ] );
-                            }
+								eigenVectors[ 0 ] = glm::normalize( eigenVectors_[ 0 ] );
+								eigenVectors[ 1 ] = glm::normalize( eigenVectors_[ 2 ] );
+							}
 							else //if ( eig1 == minEig ) most unlikly case
 							{
-                                eigenVectors[ 0 ] = glm::normalize( eigenVectors_[ 1 ] );
-                                eigenVectors[ 1 ] = glm::normalize( eigenVectors_[ 2 ] );
-                            }
+								eigenVectors[ 0 ] = glm::normalize( eigenVectors_[ 1 ] );
+								eigenVectors[ 1 ] = glm::normalize( eigenVectors_[ 2 ] );
+							}
 						}
 
 						std::vector<glm::vec2> facePointsProjected( face_vertIds.size() );
@@ -461,9 +461,9 @@ static inline constexpr uint64_t fasthash64_mix(uint64_t h)
 
 static inline constexpr uint64_t fasthash64( uint64_t v, uint64_t seed )
 {
-	constexpr uint64_t    m = 0x880355f21e6d1965ULL;
-	constexpr uint64_t    m_size = m * sizeof(uint64_t);
-	constexpr uint64_t    m_p2 = m * m;
+	constexpr uint64_t	m = 0x880355f21e6d1965ULL;
+	constexpr uint64_t	m_size = m * sizeof(uint64_t);
+	constexpr uint64_t	m_p2 = m * m;
 
 	uint64_t h = seed ^ m_size;
 	h ^= fasthash64_mix(v);
@@ -495,7 +495,7 @@ static std::vector<unsigned int> triangulatePolygon( const std::vector<glm::vec2
 
 		void SetTriangle( unsigned int triIdx, unsigned int i0, unsigned int i1, unsigned int i2 )
 		{
-			triIdxList[ triIdx * 3    ] = i0;
+			triIdxList[ triIdx * 3	] = i0;
 			triIdxList[ triIdx * 3 + 1] = i1;
 			triIdxList[ triIdx * 3 + 2] = i2;
 		}
@@ -546,7 +546,7 @@ static std::vector<unsigned int> triangulatePolygon( const std::vector<glm::vec2
 	auto computeAngle = [ & ]( const size_t i )->void
 	{
 		glm::vec2 prevP = polygon[ polygonNodes[advNode(i,-1)].id ];
-		glm::vec2     P = polygon[ polygonNodes[        i    ].id ];
+		glm::vec2	 P = polygon[ polygonNodes[		i	].id ];
 		glm::vec2 postP = polygon[ polygonNodes[advNode(i, 1)].id ];
 
 		float angle1 = atan2f( prevP.y - P.y, prevP.x - P.x );
@@ -578,7 +578,7 @@ static std::vector<unsigned int> triangulatePolygon( const std::vector<glm::vec2
 						) ) );
 
 		const unsigned int i0 = polygonNodes[ advNode( minAngleIdx, -1 ) ].id;
-		const unsigned int i1 = polygonNodes[          minAngleIdx       ].id;
+		const unsigned int i1 = polygonNodes[		  minAngleIdx	   ].id;
 		const unsigned int i2 = polygonNodes[ advNode( minAngleIdx,  1 ) ].id;
 
 		triangulation.AppendTriangle( i0, i1, i2 );

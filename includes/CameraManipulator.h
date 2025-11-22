@@ -11,12 +11,12 @@ struct SDL_MouseWheelEvent;
 class CameraManipulator
 {
 public:
-    CameraManipulator();
+	CameraManipulator();
 
-    ~CameraManipulator();
+	~CameraManipulator();
 
 	void SetCamera( Camera* _pCamera );
-    void Update( float _deltaTime );
+	void Update( float _deltaTime );
 
 	inline void  SetSpeed(float _speed) { m_speed = _speed; }
 	inline float GetSpeed() const noexcept { return m_speed; }
@@ -27,7 +27,7 @@ public:
 	void MouseWheel(const SDL_MouseWheelEvent& wheel );
 
 private:
-    Camera* m_pCamera = nullptr;
+	Camera* m_pCamera = nullptr;
 
 	// The u spherical coordinate of the spherical coordinate pair (u,v) denoting the
 	// current viewing direction from the view position m_eye. 
@@ -43,8 +43,8 @@ private:
 	// The center of model sphere.
 	glm::vec3 m_center = glm::vec3( 0.0f );
 
-    // The world-up vector of the camera.
-    glm::vec3 m_worldUp = glm::vec3( 0.0f, 1.0f, 0.0f );
+	// The world-up vector of the camera.
+	glm::vec3 m_worldUp = glm::vec3( 0.0f, 1.0f, 0.0f );
 
 	// The traversal speed of the camera
 	float m_speed = 16.0f;
@@ -52,5 +52,5 @@ private:
 	// Traveling indicator to different directions.
 	float	m_goForward = 0.0f;
 	float	m_goRight   = 0.0f;
-	float   m_goUp      = 0.0f;
+	float   m_goUp	  = 0.0f;
 };

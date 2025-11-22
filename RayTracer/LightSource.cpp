@@ -1,8 +1,10 @@
 #include "LightSource.h"
 
-LightSource::LightSource(glm::vec2 origin, int rayCount)
+LightSource::LightSource(glm::vec2 origin, float direction, int fov, int rayCount)
 {
 	this->origin = origin;
+	this->direction = direction;
+	this->fov = fov;
 	this->rayCount = rayCount;
 }
 
@@ -33,13 +35,13 @@ static Ray CastRay(glm::vec2 origin, float angle)
 	return ray;
 }
 
-static std::vector<Ray> CastRays(glm::vec2 origin, int rayCount)
+static std::vector<Ray> CastRays(glm::vec2 origin, float direction, int fov, int rayCount)
 {
 	std::vector<Ray> rays(rayCount);
 
 	for (int i = 0; i < rayCount; ++i)
 	{
-		float radian = glm::radians(360.0f / rayCount * i);
+		float radian = glm::radians(static_cast<float>(fov) / rayCount * i + direction);
 		rays[i] = CastRay(origin, radian);
 	}
 
@@ -74,7 +76,7 @@ std::vector<glm::vec2> LightSource::Shine(std::vector<SceneObject> sceneObjects)
 
 	std::vector<glm::vec2> intersections = {};
 
-	for (Ray ray : CastRays(origin, rayCount))
+	for (Ray ray : CastRays(origin, direction, fov, rayCount))
 	{
 		glm::vec2 intersection;
 

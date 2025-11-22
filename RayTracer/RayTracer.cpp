@@ -88,6 +88,33 @@ static MeshObject<Vertex> CreateCircle(int sides)
 	return mesh;
 }
 
+static std::vector<SceneObject> Genearate3DView(glm::vec2 origin, std::vector<glm::vec2> distances, ObjectContainer cube)
+{
+	const float width = 24.f;
+	const float height = 8.f;
+
+	const float halfWidht = width / 2;
+	const int fov = distances.size();
+	const float degWidth = width / fov;
+	const float dislocation = halfWidht - degWidth / 2;
+
+	std::vector<SceneObject> result = {};
+
+	for (int i = 0; i < fov; ++i)
+	{
+		SceneObject sceneObject = SceneObject(
+			cube, 
+			glm::translate(glm::vec3(degWidth * (fov - i - 1) - dislocation, 0, 0)) *
+			glm::scale(glm::vec3(degWidth, height / glm::distance(origin, distances[i]), 1)),
+			glm::vec3(1 / glm::distance(origin, distances[i]), 0, 0)
+		);
+
+		result.push_back(sceneObject);
+	}
+
+	return result;
+}
+
 static bool HitPlane(const Ray& ray, const glm::vec3& planeQ, const glm::vec3& planeI, const glm::vec3& planeJ, Intersection& result)
 {
 	// sík parametrikus egyenlete: palneQ + u * planeI + v * planeJ
@@ -226,12 +253,12 @@ bool RayTracer::Init()
 	InitObjects();
 
 	glEnable(GL_CULL_FACE); // kapcsoljuk be a hátrafelé nézõ lapok eldobását
-	glCullFace(GL_BACK);    // GL_BACK: a kamerától "elfelé" nézõ lapok, GL_FRONT: a kamera felé nézõ lapok
+	glCullFace(GL_BACK);	// GL_BACK: a kamerától "elfelé" nézõ lapok, GL_FRONT: a kamera felé nézõ lapok
 
 	glEnable(GL_DEPTH_TEST); // mélységi teszt bekapcsolása (takarás)
 
 	m_camera.SetView(
-		glm::vec3(0.0, 0.0, 3.0),  // honnan nézzük a színteret	   - eye
+		glm::vec3(0.0, 0.0, 26.0),  // honnan nézzük a színteret	   - eye
 		glm::vec3(0.0, 0.0, 0.0),  // a színtér melyik pontját nézzük - at
 		glm::vec3(0.0, 1.0, 0.0)); // felfelé mutató irány a világban - up
 
@@ -265,7 +292,6 @@ void RayTracer::Update(const SUpdateInfo& updateInfo)
 	}
 
 	m_cameraManipulator.Update(updateInfo.DeltaTimeInSec);
-
 }
 
 void RayTracer::SetCommonUniforms()
@@ -308,17 +334,24 @@ void RayTracer::Render()
 	glBindSampler(0, m_SamplerID);
 	//glBindSampler(1, m_SamplerID);
 
+	std::vector<glm::vec2> hits = lightSource.Shine(objects);
+
 	if (showSceneObjects)
+	{
 		RenderSceneObject(SceneObject(circle, glm::translate(glm::vec3(lightSource.origin, 0)) * glm::scale(glm::vec3(0.3, 0.3, 1)), glm::vec3(1, 0, 0)));
 
-	for (const SceneObject& sceneObject : objects)
-	{
-		if (showSceneObjects)
+		for (const SceneObject& sceneObject : objects)
 			RenderSceneObject(sceneObject);
+
+		for (glm::vec2 hit : hits)
+			RenderSceneObject(SceneObject(circle, glm::translate(glm::vec3(hit.x, hit.y, -0.01)) * glm::scale(glm::vec3(0.2, 0.2, 1)), glm::vec3(1, 0, 0)));
 	}
 
-	for (glm::vec2 hit : lightSource.Shine(objects))
-		RenderSceneObject(SceneObject(circle, glm::translate(glm::vec3(hit.x, hit.y, -0.01)) * glm::scale(glm::vec3(0.2, 0.2, 1)), glm::vec3(1, 0, 0)));
+	if (!showSceneObjects)
+	{
+		for (const SceneObject& sceneObject : Genearate3DView(lightSource.origin, hits, quad))
+			RenderSceneObject(sceneObject);
+	}
 
 
 	glBindTextureUnit(0, 0);
@@ -335,7 +368,9 @@ void RayTracer::RenderGUI()
 	{
 		ImGui::Checkbox("Show SceneObjects", &showSceneObjects);
 		ImGui::SliderInt("Ray count", &lightSource.rayCount, 0, 200);
-		ImGui::DragFloat2("Ray count", &lightSource.origin.x, 0.01, -5, 5);
+		ImGui::SliderFloat2("Position", &lightSource.origin.x, 0.01, -5);
+		ImGui::SliderFloat("Direction", &lightSource.direction, 0, 360);
+		ImGui::SliderInt("FOV", &lightSource.fov, 60, 180);
 	}
 	ImGui::End();
 }
