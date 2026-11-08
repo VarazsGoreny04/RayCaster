@@ -62,10 +62,10 @@
     <ClInclude Include="..\includes\GLUtils.hpp">
       <Filter>GLUtils</Filter>
     </ClInclude>
-    <ClInclude Include="..\includes\ObjParser.h">
+    <ClInclude Include="..\includes\ObjParser.hpp">
       <Filter>GLUtils</Filter>
     </ClInclude>
-    <ClInclude Include="..\includes\SDL_GLDebugMessageCallback.h">
+    <ClInclude Include="..\includes\SDL_GLDebugMessageCallback.hpp">
       <Filter>GLUtils</Filter>
     </ClInclude>
     <ClInclude Include="RayTracer.hpp">

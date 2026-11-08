@@ -97,10 +97,10 @@
     <ClInclude Include="LightSource.hpp" />
     <ClInclude Include="Ray.hpp" />
     <ClInclude Include="RayTracer.hpp" />
-    <ClInclude Include="..\includes\SDL_GLDebugMessageCallback.h" />
+    <ClInclude Include="..\includes\SDL_GLDebugMessageCallback.hpp" />
     <ClInclude Include="..\includes\GLUtils.hpp" />
     <ClInclude Include="..\includes\Camera.hpp" />
-    <ClInclude Include="..\includes\ObjParser.h" />
+    <ClInclude Include="..\includes\ObjParser.hpp" />
     <ClInclude Include="..\includes\ObjectManipulator.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SceneObject.hpp" />

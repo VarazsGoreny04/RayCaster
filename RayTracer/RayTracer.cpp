@@ -1,6 +1,6 @@
 #include "RayTracer.hpp"
-#include "../includes/ObjParser.h"
-#include "../includes/SDL_GLDebugMessageCallback.h"
+#include "../includes/ObjParser.hpp"
+#include "../includes/SDL_GLDebugMessageCallback.hpp"
 
 #include <imgui.h>
 

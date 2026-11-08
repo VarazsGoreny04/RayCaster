@@ -1,4 +1,4 @@
-#include "ObjParser.h"
+#include "ObjParser.hpp"
 #include <array>
 #include <list>
 #include <string>
