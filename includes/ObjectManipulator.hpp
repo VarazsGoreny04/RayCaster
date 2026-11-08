@@ -1,8 +1,6 @@
-#ifndef OBJECTMANIPULATOR_H
-#define OBJECTMANIPULATOR_H
+#pragma once
 
 #include <glm/glm.hpp>
-#include "../LightSource.h"
 
 struct SDL_KeyboardEvent;
 struct SDL_MouseMotionEvent;
@@ -30,5 +28,3 @@ public:
 	void KeyboardUp(const SDL_KeyboardEvent& key);
 	void MouseMove(const SDL_MouseMotionEvent& mouse) const;
 };
-
-#endif // OBJECTMANIPULATOR_H

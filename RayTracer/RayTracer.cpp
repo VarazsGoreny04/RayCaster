@@ -1,4 +1,4 @@
-#include "RayTracer.h"
+#include "RayTracer.hpp"
 #include "../includes/ObjParser.h"
 #include "../includes/SDL_GLDebugMessageCallback.h"
 
@@ -77,7 +77,7 @@ static std::vector<SceneObject> Genearate3DView(glm::vec2 origin, std::vector<gl
 	const float height = 8.f;
 
 	const float halfWidht = width / 2;
-	const int fov = distances.size();
+	const size_t fov = distances.size();
 	const float degWidth = width / fov;
 	const float dislocation = halfWidht - degWidth / 2;
 

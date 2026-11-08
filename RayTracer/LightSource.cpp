@@ -1,4 +1,4 @@
-#include "LightSource.h"
+#include "LightSource.hpp"
 
 LightSource::LightSource(glm::vec2 origin, float direction, int fov, int rayCount) : origin(origin), direction(direction), fov(fov), rayCount(rayCount) {}
 

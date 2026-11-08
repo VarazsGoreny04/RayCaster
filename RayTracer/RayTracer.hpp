@@ -1,5 +1,4 @@
-#ifndef RAYTRACER_H
-#define RAYTRACER_H
+#pragma once
 
 // GLM
 #include <glm/glm.hpp>
@@ -14,13 +13,13 @@
 #include <SDL2/SDL_opengl.h>
 
 // Utils
-#include "../includes/Camera.h"
-#include "../includes/ObjectManipulator.h"
+#include "../includes/Camera.hpp"
+#include "../includes/ObjectManipulator.hpp"
 #include "../includes/GLUtils.hpp"
 
 // Mine
-#include "LightSource.h"
-#include "SceneObject.h"
+#include "LightSource.hpp"
+#include "SceneObject.hpp"
 
 struct SUpdateInfo
 {
@@ -112,5 +111,3 @@ protected:
 	void InitTextures();
 	void CleanTextures() const;
 };
-
-#endif // RAYTRACER_H

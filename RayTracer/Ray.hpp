@@ -1,5 +1,4 @@
-#ifndef RAY_H
-#define RAY_H
+#pragma once
 
 #include <vector>
 #include <glm/glm.hpp>
@@ -17,5 +16,3 @@ public:
 };
 
 bool Intersect(Ray& ray, std::vector<glm::vec2> points, glm::vec2& result);
-
-#endif // RAY_H

@@ -1,5 +1,4 @@
-#ifndef SCENEOBJECT_H
-#define SCENEOBJECT_H
+#pragma once
 
 #include <glm/glm.hpp>
 #include "../includes/GLUtils.hpp"
@@ -19,5 +18,3 @@ public:
 	
 	SceneObject(ObjectContainer objContainer, glm::mat4 transform, glm::vec3 color);
 };
-
-#endif // SCENEOBJECT_H

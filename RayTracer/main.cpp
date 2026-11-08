@@ -14,7 +14,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "RayTracer.h"
+#include "RayTracer.hpp"
 
 static int InitSDL()
 {

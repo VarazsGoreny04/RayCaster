@@ -94,16 +94,16 @@
     <ClCompile Include="SceneObject.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="LightSource.h" />
-    <ClInclude Include="Ray.h" />
-    <ClInclude Include="RayTracer.h" />
+    <ClInclude Include="LightSource.hpp" />
+    <ClInclude Include="Ray.hpp" />
+    <ClInclude Include="RayTracer.hpp" />
     <ClInclude Include="..\includes\SDL_GLDebugMessageCallback.h" />
     <ClInclude Include="..\includes\GLUtils.hpp" />
-    <ClInclude Include="..\includes\Camera.h" />
+    <ClInclude Include="..\includes\Camera.hpp" />
     <ClInclude Include="..\includes\ObjParser.h" />
-    <ClInclude Include="..\includes\ObjectManipulator.h" />
+    <ClInclude Include="..\includes\ObjectManipulator.hpp" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="SceneObject.h" />
+    <ClInclude Include="SceneObject.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Shaders\Vert_PosNormTex.vert" />

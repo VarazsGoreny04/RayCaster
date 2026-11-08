@@ -1,4 +1,4 @@
-#include "ObjectManipulator.h"
+#include "ObjectManipulator.hpp"
 
 #include <SDL2/SDL.h>
 

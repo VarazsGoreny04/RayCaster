@@ -1,4 +1,4 @@
-#include "SceneObject.h"
+#include "SceneObject.hpp"
 
 SceneObject::SceneObject(ObjectContainer objContainer, glm::mat4 transform, glm::vec3 color)
 {

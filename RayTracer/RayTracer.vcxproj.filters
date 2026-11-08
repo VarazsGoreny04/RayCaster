@@ -56,7 +56,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\includes\Camera.h">
+    <ClInclude Include="..\includes\Camera.hpp">
       <Filter>GLUtils</Filter>
     </ClInclude>
     <ClInclude Include="..\includes\GLUtils.hpp">
@@ -68,22 +68,22 @@
     <ClInclude Include="..\includes\SDL_GLDebugMessageCallback.h">
       <Filter>GLUtils</Filter>
     </ClInclude>
-    <ClInclude Include="RayTracer.h">
+    <ClInclude Include="RayTracer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LightSource.h">
+    <ClInclude Include="LightSource.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Ray.h">
+    <ClInclude Include="Ray.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SceneObject.h">
+    <ClInclude Include="SceneObject.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\includes\ObjectManipulator.h">
+    <ClInclude Include="..\includes\ObjectManipulator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
